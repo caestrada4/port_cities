@@ -1,41 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-  <record id="view_site_dynamic_requirement_tree" model="ir.ui.view">
-    <field name="name">site.dynamic.requirement.tree</field>
-    <field name="model">site.dynamic.requirement</field>
+  <!-- Action + menu para Requirements (under Projects / Configuration) -->
+  <record id="action_dynamic_requirement" model="ir.actions.act_window">
+    <field name="name">Requirements</field>
+    <field name="res_model">dynamic.requirement.field</field>
+    <field name="view_mode">tree,form</field>
+    <field name="help" type="html">
+      <p class="o_view_nocontent_smiling_face">
+        No requirements found. Create one!
+      </p>
+    </field>
+  </record>
+
+  <!-- Menú - lo colocamos bajo project.menu_projects (si tu instalación tiene otro id, reemplázalo) -->
+  <menuitem id="menu_dynamic_requirement"
+    name="Requirements"
+    parent="project.menu_main_pm"
+    action="action_dynamic_requirement"
+    sequence="15" />
+  <!-- Tree view for requirement -->
+  <record id="view_dynamic_requirement_tree" model="ir.ui.view">
+    <field name="name">dynamic.requirement.field.tree</field>
+    <field name="model">dynamic.requirement.field</field>
     <field name="arch" type="xml">
-      <tree>
-        <field name="name"/>
-        <field name="model_name"/>
-        <field name="field_name"/>
-        <field name="stage_id"/>
-        <field name="error_message"/>
+      <tree string="Requirements">
+        <field name="name" />
+        <field name="type" />
+        <field name="company_id" />
+        <field name="active" />
       </tree>
     </field>
   </record>
 
-  <record id="view_site_dynamic_requirement_form" model="ir.ui.view">
-    <field name="name">site.dynamic.requirement.form</field>
-    <field name="model">site.dynamic.requirement</field>
+  <!-- Form view for requirement with lines -->
+  <record id="view_dynamic_requirement_form" model="ir.ui.view">
+    <field name="name">dynamic.requirement.field.form</field>
+    <field name="model">dynamic.requirement.field</field>
     <field name="arch" type="xml">
-      <form>
+      <form string="Requirement">
         <sheet>
           <group>
-            <field name="name"/>
-            <field name="model_name"/>
-            <field name="field_name"/>
-            <field name="stage_id"/>
-            <field name="error_message"/>
+            <field name="name" />
+            <field name="type" />
+            <field name="company_id" />
+            <field name="active" />
           </group>
+          <notebook>
+            <page string="Conditions">
+              <field name="line_ids">
+                <tree editable="bottom">
+                  <field name="sequence" />
+                  <field name="stage_id" />
+                  <field name="mandatory_fields" widget="many2many_tags"
+                    options="{'no_create': True}" />
+                  <field name="custom_warning_msg" />
+                  <field name="company_id" />
+                </tree>
+              </field>
+            </page>
+          </notebook>
         </sheet>
       </form>
     </field>
   </record>
 
-  <record id="action_site_dynamic_requirement" model="ir.actions.act_window">
-    <field name="name">Requirements</field>
-    <field name="res_model">site.dynamic.requirement</field>
-    <field name="view_mode">tree,form</field>
+  <!-- Tree view for lines (optional quick access) -->
+  <record id="view_dynamic_requirement_line_tree" model="ir.ui.view">
+    <field name="name">dynamic.requirement.field.line.tree</field>
+    <field name="model">dynamic.requirement.field.line</field>
+    <field name="arch" type="xml">
+      <tree string="Requirement Lines">
+        <field name="requirement_id" />
+        <field name="sequence" />
+        <field name="stage_id" />
+        <field name="mandatory_fields" />
+        <field name="custom_warning_msg" />
+      </tree>
+    </field>
   </record>
 
-  <menuitem id="menu_site_requirements" name="Requirements" parent="menu_sites_root" action="action_site_dynamic_requirement" sequence="10"/>
+  <!-- Add requirement_id to project.form (Site) and show on form -->
+  <record id="view_project_form_inherit_requirement" model="ir.ui.view">
+    <field name="name">project.project.form.inherit.requirement</field>
+    <field name="model">project.project</field>
+    <!--
+       ATTENCIÓN: el inherit_id ref debe existir en tu base. Si tu form de project tiene otro external id,
+       reemplaza "project.edit_project" por el external id real (ver Settings → Technical → Views).
+    -->
+    <field name="inherit_id" ref="project.edit_project" />
+    <field name="arch" type="xml">
+      <!-- Insertamos en el sheet, primer group -->
+      <xpath expr="//sheet//group[1]" position="inside">
+        <group string="Requirements">
+          <field name="requirement_id" options="{'no_create': True}" />
+        </group>
+      </xpath>
+    </field>
+  </record>
+
 </odoo>

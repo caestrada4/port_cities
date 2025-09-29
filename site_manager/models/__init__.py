@@ -1,2 +1,2 @@
-from . import site_project
-from . import dynamic_requirement
+from . import project_inherit
+from . import requirement

@@ -11,6 +11,7 @@
         "security/ir.model.access.csv",
         "views/site_views.xml",
         "views/requirement_views.xml",
+        "views/project_site_views.xml",
     ],
     "installable": True,
     "application": False,
